@@ -1,0 +1,315 @@
+<title>Shazim's Match Day</title>
+<!--FONTS-->
+<style>
+/* Concept: a black-and-gold envelope on a floodlit night pitch. Tap the seal, the card slides out, the page becomes a scrolling invitation.
+   Single committed dark look (stage) with an ivory paper card. */
+:root{
+  --night:#040405;--ink:#111;--red:#c8102e;--red-hi:#e8263f;--gold:#c3993a;--gold-hi:#f6dc8b;--gold-lo:#8a6a17;--ivory:#f3ede1;--green:#0b5a3a;--snow:#f7f5ee;
+  --bsd:"Big Shoulders Display","Oswald","Arial Narrow",Impact,sans-serif;
+  --bc:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --cg:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --pin:"Pinyon Script","Brush Script MT",cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--night);color:var(--snow);overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--bc)}
+button{font:inherit}
+#bg{position:fixed;left:0;top:0;width:100vw;height:100vh;object-fit:cover;z-index:0}
+#stage{position:fixed;left:0;top:0;width:540px;height:960px;transform-origin:0 0;z-index:5}
+#fx{position:absolute;left:0;top:0;width:540px;height:960px;z-index:200;pointer-events:none}
+.envp{position:absolute;left:60px;top:430px;width:420px;height:290px;transform-origin:210px 145px}
+#eShadow{z-index:1;top:690px;height:60px}
+#eShadow i{position:absolute;left:30px;right:30px;top:10px;height:34px;border-radius:50%;background:rgba(0,0,0,.75);filter:blur(16px)}
+#eBack{z-index:10;background:linear-gradient(180deg,#4d0512 0,#7d0a1d 26%,#8f0b22 100%);border-radius:3px}
+#eBack::after{content:"";position:absolute;inset:0;background-image:linear-gradient(45deg,rgba(255,255,255,.055) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.055) 75%),linear-gradient(-45deg,rgba(255,255,255,.055) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.055) 75%);background-size:16px 16px}
+#eGlow{z-index:15;pointer-events:none}
+#eGlow i{position:absolute;left:-80px;top:-160px;width:580px;height:420px;background:radial-gradient(ellipse at 50% 48%,rgba(255,226,140,.95) 0,rgba(255,190,80,.5) 28%,transparent 66%)}
+#card{position:absolute;z-index:17;left:0;top:0;overflow:hidden;background:var(--ivory);box-shadow:0 26px 60px rgba(0,0,0,.6),0 0 0 1px rgba(195,153,58,.6);transform-origin:50% 50%;display:none}
+#cardIn{position:absolute;left:0;top:0;width:480px;height:1530px;transform-origin:0 0}
+#cardSheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,244,205,.5) 50%,transparent 62%);background-size:300% 100%;background-repeat:no-repeat;mix-blend-mode:soft-light;opacity:0}
+#ePocket{z-index:30;filter:drop-shadow(0 -3px 5px rgba(0,0,0,.65))}
+#eSheen{z-index:31;clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%);background:linear-gradient(108deg,transparent 40%,rgba(255,240,200,.22) 50%,transparent 60%);background-size:300% 100%;background-repeat:no-repeat}
+#eText{z-index:32;text-align:center;pointer-events:none}
+#eText .s{position:absolute;left:0;right:0;top:196px;font:400 50px/1 var(--pin);background:linear-gradient(180deg,#fbe9a8,#e0b850 50%,#9a741c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+#eText .c{position:absolute;left:0;right:0;top:254px;font:600 13px/1 var(--bc);letter-spacing:.5em;color:#cfa94a;padding-left:.5em}
+#eFlap{height:176px;transform-origin:50% 0;transform-style:preserve-3d}
+#eFlap .f{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#eFlap .in{transform:rotateY(180deg)}
+#eSeal{position:absolute;width:76px;height:76px;left:172px;top:138px;transform-origin:38px 38px}
+#tapHint{position:absolute;left:0;right:0;top:812px;text-align:center;z-index:90;font:600 20px/1 var(--bc);letter-spacing:.55em;padding-left:.55em;color:var(--gold-hi);text-shadow:0 0 14px rgba(246,220,139,.55);opacity:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- the paper page ---------- */
+#page{position:absolute;left:0;top:0;width:480px;height:1530px;background:radial-gradient(120% 30% at 50% 12%,#f8f3e8,#efe7d6 70%,#e5dbc4)}
+#paperNoise{position:absolute;inset:0;opacity:.5;mix-blend-mode:multiply;pointer-events:none}
+.p-flag{position:absolute;left:0;top:0;width:480px;height:8px;background:linear-gradient(90deg,#0b5a3a 0 40%,#c8102e 40% 100%)}
+.p-frame{position:absolute;left:12px;top:16px;right:12px;bottom:12px;border:1.5px solid var(--gold)}
+.p-frame::before{content:"";position:absolute;inset:4px;border:1px solid rgba(195,153,58,.45)}
+.p-ghost{position:absolute;right:-30px;top:560px;font:900 560px/1 var(--bsd);color:transparent;-webkit-text-stroke:2px rgba(200,16,46,.09);pointer-events:none}
+#photoWrap{position:absolute;left:24px;top:28px;width:432px;height:296px;overflow:hidden;border:2px solid var(--gold);border-radius:3px;box-shadow:0 6px 18px rgba(60,40,10,.3);background:#0a3a24}
+#photoWrap img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:50% 0%}
+#photoWrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 65%,rgba(20,4,8,.35));box-shadow:inset 0 0 0 4px rgba(243,237,225,.9)}
+#badge7{position:absolute;left:380px;top:288px;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8263f,#a80d26 75%);border:3px solid var(--gold);box-shadow:0 6px 14px rgba(0,0,0,.4);display:grid;place-items:center;transform-origin:50% 50%}
+#badge7 span{font:900 46px/1 var(--bsd);color:var(--gold-hi);margin-top:2px}
+.ctr{position:absolute;left:0;width:480px;text-align:center;white-space:nowrap}
+#kicker{top:372px;display:flex;justify-content:center;align-items:center;gap:14px;font:600 21px/1 var(--bc);letter-spacing:.42em;color:var(--red);padding-left:.42em}
+#kicker i,#h1c i{display:block;width:54px;height:1.5px;background:var(--gold)}
+#h1a{top:398px;font:800 62px/1 var(--bsd);letter-spacing:.03em;color:var(--red)}
+#h1b{top:454px;font:900 112px/.88 var(--bsd);letter-spacing:.01em;color:var(--ink)}
+#h1c{top:560px;display:flex;justify-content:center;align-items:center;gap:14px;font:800 45px/1 var(--bsd);letter-spacing:.26em;color:var(--ink);padding-left:.26em}
+#cel1{top:636px;font:italic 600 30px/1 var(--cg);color:#4a4030}
+#cel2{top:666px;font:900 68px/.95 var(--bsd);letter-spacing:.03em;background:linear-gradient(180deg,#b78a25,#e4c15d 48%,#8a6410);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1.5px 0 rgba(60,40,5,.35))}
+#cel3{top:726px;font:400 56px/1.1 var(--pin);color:var(--red)}
+#tag{position:absolute;left:44px;width:392px;top:884px;text-align:center;font:italic 600 32px/1.16 var(--cg);color:#2a2318}
+#board{position:absolute;left:30px;top:1024px;width:420px;background:#0b0b0c;border:1.5px solid var(--gold);box-shadow:0 14px 30px rgba(40,25,5,.35)}
+#board .bar{height:8px;background:linear-gradient(90deg,#0b5a3a 0 40%,#c8102e 40% 100%);transform-origin:0 50%}
+#board .row{padding:16px 26px 14px;border-top:1px dashed rgba(217,180,74,.4);position:relative}
+#board .lb{font:600 16px/1 var(--bc);letter-spacing:.36em;color:var(--gold-hi)}
+#board .vl{margin-top:8px;font:800 46px/1 var(--bsd);letter-spacing:.02em;color:var(--snow);text-transform:uppercase}
+#board .ad{margin-top:8px;font:500 17px/1.3 var(--bc);letter-spacing:.03em;color:#d6cdb8}
+.btn-loc{position:absolute;left:30px;top:1416px;width:420px;height:64px;display:flex;align-items:center;justify-content:center;gap:12px;font:800 26px/1 var(--bsd);letter-spacing:.16em;text-transform:uppercase;color:#fff;text-decoration:none;background:linear-gradient(180deg,var(--red-hi),var(--red));border:1.5px solid var(--gold);border-radius:8px;box-shadow:0 10px 24px rgba(200,16,46,.45),inset 0 1px 0 rgba(255,255,255,.3);cursor:pointer}
+.btn-loc svg{width:26px;height:26px;flex:none}
+.btn-loc:hover{filter:brightness(1.08)}
+#locHint{position:absolute;left:0;width:480px;top:1488px;text-align:center;font:600 14px/1 var(--bc);letter-spacing:.3em;color:#6b5d3d;text-transform:uppercase}
+
+/* ---------- scroll reveals ---------- */
+.rise{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rise.in{opacity:1;transform:none}
+
+/* ---------- document mode ---------- */
+#doc{position:fixed;inset:0;z-index:100;overflow-y:auto;overflow-x:hidden;display:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#docHolder{position:relative;margin:0 auto;overflow:hidden;box-shadow:0 0 0 1px rgba(195,153,58,.5),0 30px 80px rgba(0,0,0,.7)}
+#docPage{position:absolute;left:0;top:0;width:480px;transform-origin:0 0}
+#pageSlot{position:relative;width:480px;height:1530px}
+#lower{position:relative;width:480px;background:#050807;color:var(--snow);overflow:hidden;padding:0 30px 46px}
+#lower::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 26% at 50% 0,rgba(200,16,46,.3),transparent 72%),repeating-linear-gradient(90deg,rgba(14,80,50,.42) 0 60px,rgba(9,58,36,.42) 60px 120px);-webkit-mask-image:linear-gradient(180deg,#000,transparent 96%);mask-image:linear-gradient(180deg,#000,transparent 96%)}
+#lower .flag{position:absolute;left:0;top:0;width:480px;height:8px;background:linear-gradient(90deg,#0b5a3a 0 40%,#c8102e 40% 100%)}
+.lz{position:relative;text-align:center}
+.lz.first{padding-top:64px}
+.lz+.lz{margin-top:70px}
+.eyebrow{font:600 18px/1 var(--bc);letter-spacing:.5em;padding-left:.5em;color:var(--gold-hi)}
+.h2{margin-top:10px;font:900 64px/.92 var(--bsd);text-transform:uppercase;letter-spacing:.02em;background:linear-gradient(180deg,#fff,var(--gold-hi) 55%,#d9b44a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.h2.sm{font-size:46px;text-wrap:balance}
+.tiles{margin-top:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{padding:16px 0 12px;background:rgba(0,0,0,.5);border:1.5px solid rgba(195,153,58,.75);border-radius:6px}
+.tile b{display:block;font:900 54px/1 var(--bsd);font-variant-numeric:tabular-nums;background:linear-gradient(180deg,var(--gold-hi),#d9b44a 60%,#b8892b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tile span{display:block;margin-top:6px;font:600 13px/1 var(--bc);letter-spacing:.28em;padding-left:.28em;color:#cfc7b4}
+.cdnote{margin-top:16px;font:600 20px/1 var(--bc);letter-spacing:.2em;color:#e9e3d2}
+.lframe{position:relative;margin:26px auto 0;width:372px;padding:5px;border-radius:6px;background:linear-gradient(145deg,#f6dc8b,#8a6a17 40%,#d9b44a 70%,#f6dc8b);box-shadow:0 24px 60px rgba(0,0,0,.65),0 0 60px rgba(217,180,74,.25)}
+.lframe img{display:block;width:100%;height:auto;aspect-ratio:1145/1374;object-fit:cover;object-position:50% 50%;border-radius:2px}
+.cap{margin-top:18px;font:800 34px/1 var(--bsd);letter-spacing:.12em;padding-left:.12em}
+.cap2.fun{margin-top:16px}
+.cap2{margin-top:8px;font:italic 600 26px/1.1 var(--cg);color:#d6cdb8}
+.rsvp-btns{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.btn-yes,.btn-no{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:66px;border-radius:8px;font:800 24px/1.1 var(--bsd);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:#fff;cursor:pointer}
+.btn-yes{background:linear-gradient(180deg,#22a862,#0f6b3d);border:1.5px solid var(--gold);box-shadow:0 10px 26px rgba(20,140,80,.42),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn-no{background:rgba(255,255,255,.05);border:1.5px solid rgba(247,245,238,.28)}
+.btn-yes:hover,.btn-no:hover{filter:brightness(1.12)}
+.b-ball{width:32px;height:32px;flex:none}
+.card-red{width:16px;height:22px;border-radius:2px;background:var(--red-hi);transform:rotate(12deg);flex:none;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.wa-note{margin-top:14px;font:500 16px/1.3 var(--bc);letter-spacing:.06em;color:#a89f8a}
+.see{font:700 24px/1 var(--bc);letter-spacing:.6em;padding-left:.6em;color:var(--gold-hi)}
+.match{margin-top:8px;white-space:nowrap;font:900 92px/.9 var(--bsd);background:linear-gradient(105deg,#fff 0,#f6dc8b 30%,#d9b44a 50%,#f6dc8b 70%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 24px rgba(200,16,46,.55))}
+.who{margin-top:16px;font:800 38px/1 var(--bsd);letter-spacing:.12em;padding-left:.12em}
+.who b{color:#ff3b55;font-weight:800}
+.info{margin-top:14px;font:600 22px/1.3 var(--bc);letter-spacing:.18em;color:#e9e3d2}
+.ballrow{position:relative;height:96px;margin-top:22px}
+.ballrow .ball{position:absolute;left:50%;bottom:6px;width:62px;height:62px;margin-left:-31px}
+.ballrow .shadow{position:absolute;left:50%;bottom:2px;width:52px;height:10px;margin-left:-26px;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(3px)}
+.bounce .ball{animation:bounce 1.2s infinite cubic-bezier(.3,.6,.4,1)}
+.bounce .shadow{animation:shadowk 1.2s infinite cubic-bezier(.3,.6,.4,1)}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-34px) rotate(180deg)}}
+@keyframes shadowk{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(.6);opacity:.3}}
+.replay{margin-top:26px;background:none;border:0;padding:10px 14px;font:600 16px/1 var(--bc);letter-spacing:.3em;padding-left:.3em;color:#a89f8a;text-transform:uppercase;cursor:pointer}
+.replay:hover{color:var(--gold-hi)}
+.host{margin:22px auto 0;max-width:330px;padding:16px 18px 15px;border-radius:8px;background:linear-gradient(180deg,#8a1c2b,#5a0f1c);border:1.5px solid var(--gold);box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22)}
+.host span{display:block;font:600 14px/1 var(--bc);letter-spacing:.42em;padding-left:.42em;color:var(--gold-hi)}
+.host b{display:block;margin-top:8px;font:800 30px/1.05 var(--bsd);letter-spacing:.06em;color:#fff;text-transform:uppercase}
+#fxDoc{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:300;pointer-events:none}
+#fadeIn{position:fixed;inset:0;background:#000;z-index:400;pointer-events:none}
+
+/* ---------- CD player ---------- */
+.cdp{position:relative;width:340px;max-width:100%;margin:24px auto 0;padding:20px 20px 16px;border-radius:38px;background:linear-gradient(155deg,#eceae4 0,#c3bfb5 48%,#8d897f 100%);box-shadow:0 26px 50px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(0,0,0,.25);text-align:center}
+.cdp .lid{position:relative;width:250px;height:250px;margin:0 auto;border-radius:50%;background:#0d0d0f;padding:12px;box-shadow:0 0 0 6px #6f6c64,0 0 0 8px #d9d5cb,inset 0 6px 14px rgba(0,0,0,.8);cursor:pointer}
+.cdp .disc{position:relative;width:100%;height:100%;border-radius:50%;background:repeating-radial-gradient(circle,rgba(0,0,0,.07) 0 1px,transparent 1px 4px),conic-gradient(#e9e9f0,#b9c5ff 9%,#f5d8ff 18%,#e9e9f0 27%,#a6ecd4 40%,#e9e9f0 52%,#ffdcb0 66%,#e9e9f0 78%,#b9c5ff 89%,#e9e9f0);animation:cdspin 2.2s linear infinite;animation-play-state:paused}
+.cdp.on .disc{animation-play-state:running}
+.cdp .label{position:absolute;left:50%;top:50%;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8263f,#a80d26 75%);border:2px solid #d9b44a;box-shadow:0 0 0 6px rgba(255,255,255,.35)}
+.cdp .label b{position:absolute;left:0;right:0;top:5px;font:900 40px/1 var(--bsd);color:var(--gold-hi)}
+.cdp .label i{position:absolute;left:0;right:0;bottom:11px;font:700 11px/1 var(--bc);letter-spacing:.2em;padding-left:.2em;color:var(--gold-hi);font-style:normal}
+.cdp .hub{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#0d0d0f;box-shadow:0 0 0 4px rgba(255,255,255,.7),0 0 0 5px rgba(0,0,0,.35)}
+.cdp .glass{position:absolute;inset:12px;border-radius:50%;background:linear-gradient(125deg,rgba(255,255,255,.3) 0,rgba(255,255,255,.07) 36%,transparent 38%);pointer-events:none}
+.lcd{margin-top:16px;padding:8px 12px 9px;border-radius:8px;background:linear-gradient(#a3b493,#92a482);box-shadow:inset 0 2px 5px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.6);color:#1c2617;font:600 17px/1 var(--bc);letter-spacing:.14em;text-transform:uppercase;text-align:left}
+.lcd .r1{display:flex;justify-content:space-between;gap:10px}
+.lcd .t{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.lcd .tm{flex:none;font-variant-numeric:tabular-nums}
+.lcd .bar{margin-top:7px;height:4px;background:rgba(28,38,23,.25)}
+.lcd .bar i{display:block;height:100%;width:0;background:#1c2617}
+.cbtns{margin-top:14px;display:flex;justify-content:center;align-items:center;gap:16px}
+.cbtn{width:46px;height:46px;border-radius:50%;border:0;padding:0;background:linear-gradient(180deg,#f4f2ec,#bdb9ae);box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 1px 0 #fff;color:#2a2a2c;display:grid;place-items:center;cursor:pointer}
+.cbtn svg{width:20px;height:20px}
+.cbtn.play{width:66px;height:66px;background:linear-gradient(180deg,#e8263f,#a80d26);color:var(--gold-hi);box-shadow:0 0 0 2px #d9b44a,0 5px 10px rgba(0,0,0,.45)}
+.cbtn.play svg{width:28px;height:28px}
+.cbtn:active{transform:translateY(1px)}
+.cbtn .ps{display:none}.cdp.on .cbtn .pl{display:none}.cdp.on .cbtn .ps{display:block}
+.cdp.solo .skip{display:none}
+.silk{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 11px/1 var(--bc);letter-spacing:.3em;color:#59564d;text-transform:uppercase}
+.silk i{width:8px;height:8px;border-radius:50%;background:#5b3b3b;box-shadow:inset 0 1px 1px rgba(0,0,0,.5)}
+.cdp.on .silk i{background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+.cdp.mini{position:absolute;left:364px;top:272px;z-index:200;width:auto;margin:0;padding:0;background:none;box-shadow:none;border-radius:0;text-align:center}
+.cdp.mini.b{left:auto;top:auto;right:-14px;bottom:-16px}
+.cdp.mini.b .mcap{top:auto;bottom:34px}
+.cdp.mini .lid{width:104px;height:104px;padding:5px;box-shadow:0 0 0 3px #6f6c64,0 0 0 4px #d9d5cb,0 10px 22px rgba(0,0,0,.65)}
+.cdp.mini .glass{inset:5px}
+.cdp.mini .label{width:52px;height:52px;margin:-26px 0 0 -26px;border-width:1.5px;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+.cdp.mini .label b{top:0;bottom:0;display:grid;place-items:center;font-size:32px;padding-top:2px}
+.cdp.mini .hub{display:none}
+.cdp.mini .lid::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--gold-hi);opacity:0;animation:cdping 1.8s ease-out infinite;pointer-events:none}
+.cdp.mini.on .lid::after{animation:none}
+@keyframes cdping{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+#doc #badge7{visibility:hidden}
+.mcap{position:absolute;right:112px;top:36px;margin:0;display:flex;align-items:center;justify-content:center;gap:6px;max-width:190px;padding:5px 10px;border-radius:14px;background:rgba(6,8,8,.78);border:1px solid rgba(195,153,58,.6);font:700 12px/1 var(--bc);letter-spacing:.1em;color:var(--gold-hi);text-transform:uppercase;white-space:nowrap}
+.mcap span{overflow:hidden;text-overflow:ellipsis}
+.mcap i{flex:none;width:7px;height:7px;border-radius:50%;background:#7a7468}
+.cdp.on .mcap i{background:#ff3b30;box-shadow:0 0 7px #ff3b30}
+@keyframes cdspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cdp .disc{animation:none}}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.rise{transition:none}.bounce .ball,.bounce .shadow{animation:none}}
+</style>
+
+<canvas id="bg" width="540" height="960"></canvas>
+
+<div id="stage">
+  <div class="envp" id="eShadow"><i></i></div>
+  <div class="envp" id="eBack"></div>
+  <div class="envp" id="eGlow"><i></i></div>
+
+  <div id="card">
+    <div id="cardIn"><div id="page">
+      <div class="p-flag"></div><div class="p-frame"></div><div class="p-ghost">7</div>
+      <div id="photoWrap"><img src="{{LEGEND}}" alt="Shazim and a football hero in red Portugal shirts on the pitch"></div>
+      <div id="badge7"><span>3</span></div>
+      <div class="ctr" id="kicker"><i></i>YOU’RE INVITED<i></i></div>
+      <div class="ctr" id="h1a">RONALDO THEMED</div>
+      <div class="ctr" id="h1b">BIRTHDAY</div>
+      <div class="ctr" id="h1c"><i></i>CELEBRATION<i></i></div>
+      <div class="ctr" id="cel1">Celebrating</div>
+      <div class="ctr" id="cel2" data-b="nameUp">SHAZIM’S</div>
+      <div class="ctr" id="cel3">Birthday</div>
+      <div id="tag">Join us for an unforgettable football-inspired birthday celebration!</div>
+      <div id="board">
+        <div class="bar" id="bBar"></div>
+        <div class="row" id="bR1"><div class="lb">MATCH DAY</div><div class="vl" data-b="dateLong">20 October 2026</div></div>
+        <div class="row" id="bR2"><div class="lb">KICK-OFF</div><div class="vl" data-b="time">9 PM</div></div>
+        <div class="row" id="bR3"><div class="lb">VENUE</div><div class="vl" data-b="venueName">Pathan – Clifton</div><div class="ad" data-b="address"></div></div>
+      </div>
+      <a class="btn-loc" id="locBtn" href="#" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>VIEW LOCATION</a>
+      <div id="locHint">Opens Google Maps</div>
+      <canvas id="paperNoise" width="256" height="256" style="width:480px;height:1530px"></canvas>
+    </div></div>
+    <div id="cardSheen"></div>
+  </div>
+
+  <svg class="envp" id="ePocket" viewBox="0 0 420 290" width="420" height="290">
+    <defs>
+      <linearGradient id="gL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26232a"/><stop offset="1" stop-color="#141213"/></linearGradient>
+      <linearGradient id="gR" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#211e20"/><stop offset="1" stop-color="#121011"/></linearGradient>
+      <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c282a"/><stop offset="1" stop-color="#171415"/></linearGradient>
+      <linearGradient id="foil" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a6a17"/><stop offset=".5" stop-color="#f6dc8b"/><stop offset="1" stop-color="#b8892b"/></linearGradient>
+      <pattern id="lin" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="1" fill="rgba(255,255,255,.028)"/></pattern>
+    </defs>
+    <polygon points="0,0 210,168 0,290" fill="url(#gL)"/>
+    <polygon points="420,0 210,168 420,290" fill="url(#gR)"/>
+    <polygon points="0,290 210,168 420,290" fill="url(#gB)"/>
+    <polygon points="0,0 210,168 420,0 420,290 0,290" fill="url(#lin)"/>
+    <path d="M0 0L210 168L420 0" stroke="url(#foil)" stroke-width="1.6" fill="none"/>
+    <path d="M0 290L210 168L420 290" stroke="url(#foil)" stroke-width="1" fill="none" opacity=".5"/>
+    <rect x="4" y="4" width="412" height="282" fill="none" stroke="url(#foil)" stroke-width="1" opacity=".35"/>
+  </svg>
+  <div class="envp" id="eSheen"></div>
+  <div class="envp" id="eText"><div class="s" id="eScript">You’re invited</div><div class="c" id="eCaps" style="display:none"></div></div>
+
+  <div class="envp" id="eFlapWrap" style="z-index:30;pointer-events:none;height:176px">
+    <div id="eFlap" class="envp" style="left:0;top:0;width:420px;height:176px">
+      <svg class="f out" viewBox="0 0 420 176" width="420" height="176">
+        <defs>
+          <linearGradient id="fo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b272a"/><stop offset="1" stop-color="#121011"/></linearGradient>
+          <linearGradient id="foil2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a6a17"/><stop offset=".5" stop-color="#f6dc8b"/><stop offset="1" stop-color="#b8892b"/></linearGradient>
+        </defs>
+        <polygon points="0,0 420,0 210,176" fill="url(#fo)"/>
+        <polygon points="0,0 420,0 210,176" fill="url(#lin)"/>
+        <path d="M8 3L210 168L412 3" stroke="url(#foil2)" stroke-width="1.6" fill="none"/>
+        <path d="M22 3L210 152L398 3" stroke="url(#foil2)" stroke-width=".8" fill="none" opacity=".5"/>
+      </svg>
+      <svg class="f in" viewBox="0 0 420 176" width="420" height="176">
+        <defs>
+          <linearGradient id="fi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c0d25"/><stop offset="1" stop-color="#6b0816"/></linearGradient>
+          <pattern id="dia" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M8 0L16 8L8 16L0 8Z" fill="rgba(255,255,255,.06)"/></pattern>
+        </defs>
+        <polygon points="0,0 420,0 210,176" fill="url(#fi)"/>
+        <polygon points="0,0 420,0 210,176" fill="url(#dia)"/>
+        <path d="M0 0L210 176L420 0" stroke="rgba(0,0,0,.35)" stroke-width="1.4" fill="none"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="envp" id="eSealWrap" style="z-index:50;pointer-events:none"><div id="eSeal"><svg viewBox="0 0 76 76" width="76" height="76" id="sealSvg"></svg></div></div>
+  <div id="tapHint">TAP TO OPEN</div>
+  <canvas id="fx" width="810" height="1440"></canvas>
+</div>
+<button class="sr" id="openBtn" type="button">Open the invitation</button>
+
+<div id="doc">
+  <div id="docHolder"><div id="docPage">
+    <div id="pageSlot"></div>
+    <div class="cdp mini solo" id="cdp">
+      <div class="lid" id="cdLid" role="button" tabindex="0" aria-label="Play or pause the playlist">
+        <div class="disc"><div class="label"><b>3</b></div><div class="hub"></div></div>
+        <div class="glass"></div>
+      </div>
+      <div class="mcap"><i></i><span id="lcdTitle">TAP THE CD</span></div>
+    </div>
+    <div id="lower">
+      <div class="flag"></div>
+      <section class="lz first rise">
+        <div class="eyebrow">THE COUNTDOWN TO</div>
+        <div class="h2">KICK-OFF</div>
+        <div class="tiles" id="tiles">
+          <div class="tile"><b id="cdD">--</b><span>DAYS</span></div>
+          <div class="tile"><b id="cdH">--</b><span>HOURS</span></div>
+          <div class="tile"><b id="cdM">--</b><span>MINUTES</span></div>
+          <div class="tile"><b id="cdS">--</b><span>SECONDS</span></div>
+        </div>
+        <div class="cdnote"><span data-b="dateShort">20 OCT 2026</span> • <span data-b="time">9 PM</span></div>
+      </section>
+      <section class="lz rise">
+        <div class="lframe"><img src="{{SIUU}}" alt="Shazim and the football hero celebrating together"></div>
+        <div class="cap">LITTLE CHAMPION</div>
+        <div class="cap2">Big dreams, bigger goals</div>
+      </section>
+      <section class="lz rise">
+        <div class="h2 sm">WILL YOU JOIN OUR LITTLE CHAMPION’S HAT-TRICK?</div>
+        <div class="rsvp-btns">
+          <a class="btn-yes" id="yesBtn" href="#" target="_blank" rel="noopener noreferrer"><span class="b-ball" data-ball></span><span>YES, I’LL BE THERE!</span></a>
+          <a class="btn-no" id="noBtn" href="#" target="_blank" rel="noopener noreferrer"><span class="card-red"></span><span>CAN’T MAKE IT</span></a>
+        </div>
+        <div class="wa-note">Opens WhatsApp with your reply ready to send.</div>
+      </section>
+      <section class="lz rise" id="closing">
+        <div class="see">SEE YOU ON</div>
+        <div class="match">MATCH DAY!</div>
+        <div class="who"><span data-b="nameUp">SHAZIM’S</span> <b>3RD BIRTHDAY</b></div>
+        <div class="cap2 fun">with lots of fun, food &amp; pictures</div>
+        <div class="ballrow" id="ballrow"><div class="shadow"></div><div class="ball" data-ball></div></div>
+        <button class="replay" id="replay" type="button">Replay the opening</button>
+        <div class="host"><span>HOSTING:</span><b>MR &amp; MRS SHARIQ</b></div>
+      </section>
+    </div>
+  </div></div>
+</div>
+<canvas id="fxDoc"></canvas>
+<div id="fadeIn"></div>
+<script>
+{{APPJS}}
+</script>
